@@ -1,0 +1,142 @@
+<!DOCTYPE html>
+<html lang="de"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Ich kann es schaffen</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,700;0,900;1,800&family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#f5f1ea;--card:#fffdf8;--ink:#14213d;--mut:#6b7285;--line:#e3dccd;--gold:#c8922a;--ok:#13875a;--okb:#e0f5ea;--no:#c0392b;--nob:#fbe6e3;--acc:#14213d;--accx:#fff;--sh:0 10px 40px rgba(20,33,61,.12)}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#0e1424;--card:#172038;--ink:#f3efe6;--mut:#9aa3ba;--line:#2a3555;--gold:#e0b04e;--ok:#4cd39a;--okb:#123a2c;--no:#ff7b6b;--nob:#40201d;--acc:#e0b04e;--accx:#14213d;--sh:0 10px 40px rgba(0,0,0,.4)}}
+*{box-sizing:border-box}html,body{height:100%;margin:0}
+:root{padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+body{background:var(--bg);color:var(--ink);font-family:Inter,system-ui,sans-serif;display:flex;align-items:center;justify-content:center;padding:16px}
+.wrap{width:100%;max-width:640px}
+.card{background:var(--card);border:1px solid var(--line);border-radius:22px;box-shadow:var(--sh);padding:28px 24px}
+.hero{text-align:center;padding:44px 24px}
+.motto{font-family:'Playfair Display',Georgia,serif;font-weight:900;font-size:clamp(34px,8vw,56px);line-height:1.1;display:flex;align-items:center;justify-content:center;gap:16px;flex-wrap:wrap;margin:0 0 34px;letter-spacing:.5px}
+.flag{width:64px;height:38px;border-radius:5px;box-shadow:0 3px 10px rgba(0,0,0,.25);flex:none}
+input[type=text]{width:100%;font:600 18px Inter,sans-serif;padding:14px 16px;border-radius:12px;border:2px solid var(--line);background:var(--bg);color:var(--ink);outline:none}
+input[type=text]:focus{border-color:var(--gold)}
+.btn{font:700 16px Inter,sans-serif;background:var(--acc);color:var(--accx);border:0;border-radius:12px;padding:14px 26px;cursor:pointer;margin-top:14px;transition:transform .15s}
+.btn:hover{transform:translateY(-2px)}.btn:disabled{opacity:.4;cursor:not-allowed;transform:none}
+.top{display:flex;justify-content:space-between;align-items:center;font-size:13px;color:var(--mut);font-weight:600;margin-bottom:8px}
+.bar{height:8px;background:var(--line);border-radius:9px;overflow:hidden;margin-bottom:22px}
+.bar i{display:block;height:100%;background:linear-gradient(90deg,#14213d,#c0392b,#e0a526);transition:width .4s}
+.tag{display:inline-block;background:var(--bg);border:1px solid var(--line);border-radius:99px;padding:3px 12px;font-size:12px;font-weight:700;color:var(--gold);margin-bottom:12px}
+h2{font-family:'Playfair Display',Georgia,serif;font-size:clamp(22px,5vw,28px);line-height:1.3;margin:0 0 22px}
+.opt{display:block;width:100%;text-align:left;font:600 18px Inter,sans-serif;color:var(--ink);background:var(--bg);border:2px solid var(--line);border-radius:14px;padding:14px 16px;margin-bottom:10px;cursor:pointer;transition:.15s}
+.opt:hover:not(:disabled){border-color:var(--gold);transform:translateX(3px)}
+.opt.ok{background:var(--okb);border-color:var(--ok)}.opt.no{background:var(--nob);border-color:var(--no)}
+.fb{border-radius:14px;padding:14px 16px;margin-top:6px;font-size:15px;line-height:1.5}
+.fb.ok{background:var(--okb);color:var(--ok)}.fb.no{background:var(--nob);color:var(--no)}
+.fb b{font-size:17px}.note{margin-top:12px;padding:12px 14px;border-left:4px solid var(--gold);background:var(--bg);border-radius:8px;color:var(--ink);font-size:14.5px;line-height:1.5}
+.res{text-align:center}.big{font-family:'Playfair Display',Georgia,serif;font-size:72px;font-weight:900;color:var(--gold);line-height:1}
+canvas{position:fixed;inset:0;pointer-events:none;z-index:9}
+.fade{animation:f .35s}@keyframes f{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:none}}
+</style></head><body>
+<div class="wrap" id="app"></div><canvas id="cv"></canvas>
+<script>
+const FLAG='<svg class="flag" viewBox="0 0 5 3"><rect width="5" height="1" fill="#000"/><rect y="1" width="5" height="1" fill="#dd0000"/><rect y="2" width="5" height="1" fill="#ffce00"/></svg>';
+const M=[
+["(du) ___ die Hausaufgaben! – machen","Mach",["Machst","Macht","Machen"]],
+["(ihr) ___ den Text! – lesen","Lest",["Lesen","Liest","Lies"]],
+["(Sie) ___ Sie bitte langsam! – sprechen","Sprechen",["Sprich","Sprecht","Sprichst"]],
+["(du) ___ viel Wasser! – trinken","Trink",["Trinkst","Trinkt","Trinken"]],
+["(du) ___ nicht so schnell! – fahren","Fahr",["Fähr","Fährst","Fahrt"],"Bei fahren gibt es im Imperativ keinen Umlaut: Fahr! (nicht: Fähr!)"],
+["(ihr) ___ bitte leise! – sein","Seid",["Seit","Sind","Sei"],"ihr-Form von sein: Seid! Nicht verwechseln mit „seit“ (Zeit-Wort)."],
+["(du) ___ laut! – sprechen","Sprich",["Sprech","Sprichst","Sprecht"],"e → i: du sprichst → Sprich!"],
+["(du) ___ keine Angst! – haben","Hab",["Hast","Habe","Habt"],"haben → Hab! Nomen wie „Angst“ verneinst du mit kein-/keine-."],
+["(du) ___ das Buch! – lesen","Lies",["Les","Liest","Lese"],"e → ie: du liest → Lies! (-st fällt weg, das s vom Stamm bleibt.)"],
+["(du) ___ nicht so viel! – essen","Iss",["Ess","Isst","Esse"],"e → i: du isst → Iss! Das -t gehört zur Endung -st und fällt weg."],
+["(du) ___ bitte fleißig! – arbeiten","Arbeite",["Arbeit","Arbeitest","Arbeitet"],"Stamm auf -t/-d: ein -e hilft bei der Aussprache: Arbeite!"],
+["(Sie) ___ Sie bitte pünktlich! – sein","Seien",["Sind","Seid","Sei"],"Sie-Form von sein: Seien Sie …!"],
+["(ihr) ___ nicht so laut! – sprechen","Sprecht",["Sprich","Sprechen","Sprechst"]],
+["(du) ___ mir bitte! – helfen","Hilf",["Helf","Hilfst","Helfe"],"e → i: du hilfst → Hilf!"],
+["(du) ___ den Bus! – nehmen","Nimm",["Nehm","Nimmst","Nehme"],"nehmen ist unregelmäßig: du nimmst → Nimm! (kein „Nehm“)"],
+["(du) ___ hier! – warten","Warte",["Wart","Wartest","Wartet"],"Stamm auf -t → -e: Warte!"],
+["(ihr) ___ nicht so lange! – arbeiten","Arbeitet",["Arbeite","Arbeiten","Arbeitest"]],
+["(du) ___ bitte das Fenster ___! – aufmachen","Mach … auf",["Machst … auf","Auf … mach","Macht … auf"],"Trennbares Verb: Die Vorsilbe geht ans Satzende: Mach das Fenster auf!"],
+["Welcher Satz ist richtig? (du)","Geh nicht nach Hause!",["Gehst nicht nach Hause!","Geht du nicht nach Hause!","Nicht geh nach Hause!"]],
+["Welcher Satz ist richtig? (ihr)","Seid nicht traurig!",["Seit nicht traurig!","Sei nicht traurig!","Sind nicht traurig!"]],
+["Welcher Satz ist richtig? (du)","Iss keine Schokolade!",["Isst keine Schokolade!","Ess keine Schokolade!","Iss nicht keine Schokolade!"],"Nomen ohne Artikel verneinst du mit kein-. „nicht keine“ gibt es nicht."],
+["Dein Freund spricht zu leise. Du sagst:","Sprich bitte lauter!",["Sprichst bitte lauter!","Sprech bitte lauter!","Sprecht bitte lauter!"]],
+["Du sprichst mit Frau Meier (Sie). Du bittest um Hilfe:","Helfen Sie mir bitte!",["Hilf mir bitte!","Helft mir bitte!","Hilfen Sie mir bitte!"],"Sie-Form = Infinitiv + Sie: Helfen Sie …! Kein Vokalwechsel."],
+["Welcher Satz hat einen Fehler?","Fähr nicht so schnell!",["Lies das Buch!","Sei bitte pünktlich!","Nimm den Bus!"],"fahren → Fahr! Der Umlaut ä bleibt im Imperativ nicht."],
+["Welcher Satz hat einen Fehler?","Sprichst bitte leise!",["Arbeite bitte nicht so lange!","Mach das Fenster auf!","Hilf mir bitte!"],"Im du-Imperativ fällt -st weg: Sprich!"],
+["Du sprichst mit deinem Freund. Welcher Satz ist richtig?","Steh um sieben Uhr auf!",["Auf steh um sieben Uhr!","Aufstehe um sieben Uhr!","Stehst um sieben Uhr auf!"]],
+["Du sprichst mit deinen Kindern (ihr). Welcher Satz ist richtig?","Räumt die Wohnung auf!",["Räum die Wohnung auf!","Aufräumt die Wohnung!","Räumt auf die Wohnung!"],"ihr-Form: Räumt … auf! Die Vorsilbe „auf“ steht am Ende."],
+["Du sprichst mit zwei Freunden. Welcher Satz ist richtig?","Habt keine Angst!",["Hab keine Angst!","Habt nicht Angst!","Habt kein Angst!"],"„Angst“ ist feminin → keine. Zwei Personen (ihr) → Habt!"],
+["Du sprichst mit Herrn Weber. Welcher Satz ist richtig?","Seien Sie nicht traurig!",["Sind Sie nicht traurig!","Seid Sie nicht traurig!","Sei Sie nicht traurig!"],"Höflich (Sie): Seien Sie …! Das ist die Sonderform von sein."],
+["Welcher Satz ist richtig? (du)","Vergiss die Hausaufgaben nicht!",["Vergess die Hausaufgaben nicht!","Vergisst die Hausaufgaben nicht!","Vergesst die Hausaufgaben nicht!"],"e → i: du vergisst → Vergiss! Der Satz ist negativ: nicht steht am Ende."]
+];
+const T=[
+["(du) schreiben – den Text",["Schreib den Text!","Schreibe den Text!"]],
+["(ihr) kommen – bitte – schnell",["Kommt bitte schnell!","Kommt schnell bitte!","Bitte kommt schnell!"]],
+["(Sie) öffnen – bitte – die Tür",["Öffnen Sie bitte die Tür!","Öffnen Sie die Tür bitte!","Bitte öffnen Sie die Tür!"]],
+["(du) arbeiten – nicht – so lange",["Arbeite nicht so lange!"],"Stamm auf -t → Arbeite! Verneinung mit nicht."],
+["(du) sprechen – nicht – so laut",["Sprich nicht so laut!"],"e → i, ohne du und ohne -st."],
+["(ihr) sein – nicht – so laut",["Seid nicht so laut!"]],
+["(du) nehmen – nicht – den Bus",["Nimm nicht den Bus!","Nimm den Bus nicht!"],"nehmen → Nimm!"],
+["(du) aufräumen – das Zimmer",["Räum das Zimmer auf!","Räume das Zimmer auf!"],"Trennbar: Räum … auf!"],
+["(Sie) aufstehen – bitte – früh",["Stehen Sie bitte früh auf!","Stehen Sie früh bitte auf!","Bitte stehen Sie früh auf!"],"Sie-Form: Infinitiv-Form + Sie, „auf“ am Ende."],
+["(ihr) aufmachen – nicht – das Fenster",["Macht das Fenster nicht auf!","Macht nicht das Fenster auf!"],"ihr-Form + trennbares Verb: Macht … nicht auf!"]
+];
+const N=40,Q=[];
+const sh=a=>{a=a.slice();for(let i=a.length-1;i>0;i--){const j=Math.random()*(i+1)|0;[a[i],a[j]]=[a[j],a[i]]}return a};
+M.forEach(m=>Q.push({t:'mc',q:m[0],a:m[1],o:sh([m[1],...m[2]]),n:m[3]}));
+T.forEach(t=>Q.push({t:'tx',q:t[0],acc:t[1],a:t[1][0],n:t[2]}));
+const norm=s=>s.toLowerCase().replace(/ß/g,'ss').replace(/ä/g,'ae').replace(/ö/g,'oe').replace(/ü/g,'ue').replace(/[!.,?]/g,'').replace(/\s+/g,' ').trim();
+const OKM=["Super","Toll","Wunderbar","Genau","Prima","Klasse","Ausgezeichnet"],NOM=["Nicht schlimm","Fast","Kein Problem","Weiter so","Das lernst du"];
+const rnd=a=>a[Math.random()*a.length|0];
+let name='',i=0,score=0,streak=0,done=false;
+const app=document.getElementById('app'),$=s=>document.querySelector(s);
+const esc=s=>s.replace(/[&<>]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;'}[c]));
+function start(){
+  app.innerHTML=`<div class="card hero fade"><h1 class="motto"><span>Ich kann es schaffen</span>${FLAG}</h1>
+  <input type="text" id="nm" placeholder="Wie heißt du?" maxlength="30" autocomplete="off">
+  <button class="btn" id="go" disabled>Los geht’s →</button></div>`;
+  const nm=$('#nm'),go=$('#go');
+  nm.oninput=()=>go.disabled=!nm.value.trim();
+  const g=()=>{if(nm.value.trim()){name=nm.value.trim();i=0;score=0;streak=0;show()}};
+  go.onclick=g;nm.onkeydown=e=>{if(e.key==='Enter')g()};nm.focus();
+}
+function show(){
+  done=false;const q=Q[i];
+  const lv=i<10?'Aufwärmen':i<20?'Mittel':i<30?'Knifflig':'Profi';
+  const part=q.t==='mc'?'Wähle die richtige Antwort':'Schreibe den ganzen Satz im Imperativ';
+  app.innerHTML=`<div class="card fade"><div class="top"><span>Frage ${i+1} / ${N}</span><span>🔥 ${streak} · ${score} Punkte</span></div>
+  <div class="bar"><i style="width:${i/N*100}%"></i></div>
+  <span class="tag">${lv} · ${part}</span><h2>${esc(q.q)}</h2><div id="body"></div><div id="res"></div></div>`;
+  const b=$('#body');
+  if(q.t==='mc'){q.o.forEach(o=>{const x=document.createElement('button');x.className='opt';x.textContent=o;x.onclick=()=>check(o);b.appendChild(x)})}
+  else{b.innerHTML='<input type="text" id="tx" placeholder="Dein Satz …" autocomplete="off" autocapitalize="sentences" spellcheck="false"><br><button class="btn" id="ck">Prüfen</button>';
+    const t=$('#tx');$('#ck').onclick=()=>{if(t.value.trim())check(t.value)};t.onkeydown=e=>{if(e.key==='Enter'&&t.value.trim())check(t.value)};t.focus()}
+}
+function check(ans){
+  if(done)return;done=true;const q=Q[i];
+  const ok=q.t==='mc'?ans===q.a:q.acc.some(a=>norm(a)===norm(ans));
+  if(ok){score++;streak++}else streak=0;
+  if(q.t==='mc')document.querySelectorAll('.opt').forEach(x=>{x.disabled=true;if(x.textContent===q.a)x.classList.add('ok');else if(x.textContent===ans)x.classList.add('no')});
+  else{$('#tx').disabled=true;$('#ck').style.display='none'}
+  const msg=ok?`<b>✓ ${rnd(OKM)}, ${esc(name)}!</b>${streak>=3?` ${streak} richtige Antworten in Folge! 🔥`:''}`:`<b>${rnd(NOM)}, ${esc(name)}.</b> Richtig ist: <b>${esc(q.a)}</b>`;
+  $('#res').innerHTML=`<div class="fb ${ok?'ok':'no'} fade">${msg}</div>${q.n?`<div class="note fade">💡 ${esc(q.n)}</div>`:''}<button class="btn" id="nx">${i===N-1?'Ergebnis ansehen':'Weiter →'}</button>`;
+  const nx=$('#nx');nx.onclick=next;nx.focus();
+}
+function next(){i++;i<N?show():end()}
+function end(){
+  const p=Math.round(score/N*1000)/10,win=p>95;
+  const m=win?`Fantastisch, ${esc(name)}! Du bist ein Imperativ-Profi! 🏆`:p>=80?`Sehr gut, ${esc(name)}! Du bist fast ganz oben. Weiter so!`:p>=60?`Gut gemacht, ${esc(name)}! Mit etwas Übung wirst du noch besser.`:`Du hast angefangen, ${esc(name)} – das ist der wichtigste Schritt! Ich kann es schaffen. Versuch es nochmal! 💪`;
+  app.innerHTML=`<div class="card res fade"><div style="font-size:54px">${win?'🎉':'🌟'}</div><div class="big">${p}%</div>
+  <p style="font-size:18px;font-weight:600">${score} von ${N} richtig</p><h2>${m}</h2>
+  <p class="motto" style="font-size:24px;margin:0 0 10px">Ich kann es schaffen ${FLAG}</p>
+  <button class="btn" id="re">Nochmal spielen</button></div>`;
+  $('#re').onclick=()=>location.reload();
+  if(win)confetti();
+}
+function confetti(){
+  const c=document.getElementById('cv'),x=c.getContext('2d');c.width=innerWidth;c.height=innerHeight;
+  const cols=['#000','#dd0000','#ffce00','#fff','#c8922a'];
+  const P=Array.from({length:180},()=>({x:Math.random()*c.width,y:-20-Math.random()*c.height*.6,r:4+Math.random()*6,vy:2+Math.random()*4,vx:-1.5+Math.random()*3,c:cols[Math.random()*5|0],a:Math.random()*6}));
+  let f=0;(function d(){x.clearRect(0,0,c.width,c.height);P.forEach(p=>{p.y+=p.vy;p.x+=p.vx+Math.sin(p.a+=.05);x.fillStyle=p.c;x.fillRect(p.x,p.y,p.r,p.r*1.6)});if(++f<400)requestAnimationFrame(d);else x.clearRect(0,0,c.width,c.height)})();
+}
+start();
+</script></body></html>
